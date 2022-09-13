@@ -1,0 +1,56 @@
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 key pair for SSH access to the EC2 instance.
+    Type: AWS::EC2::KeyPair::KeyName
+
+  ImageId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+Resources:
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://common-templates-9348572839475.s3.ap-southeast-1.amazonaws.com/0-vpc.yaml
+      Parameters:
+        EnvironmentName: !Ref AWS::StackName
+        VpcCidr: 10.10.0.0/16
+        PublicSubnet1Cidr: 10.10.1.0/24
+        PublicSubnet2Cidr: 10.10.2.0/24
+        PrivateSubnet1Cidr: 10.10.3.0/24
+        PrivateSubnet2Cidr: 10.10.4.0/24
+
+  SecurityGroups:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://common-templates-9348572839475.s3.ap-southeast-1.amazonaws.com/1-security-group.yaml
+      Parameters:
+        EnvironmentName: !Ref AWS::StackName
+        VPC: !GetAtt VPC.Outputs.VPC
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref ImageId
+      KeyName: !Ref KeyName
+      SubnetId: !GetAtt VPC.Outputs.PublicSubnet1
+      SecurityGroupIds:
+        - !GetAtt SecurityGroups.Outputs.SecurityGroup
+      UserData:
+        Fn::Base64: |
+           #!/bin/bash
+           yum update -y
+           amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+           yum install -y httpd mariadb-server php-mbstring php-xml
+           usermod -a -G apache ec2-user
+           chown -R ec2-user:apache /var/www
+           chmod 2775 /var/www
+           find /var/www -type d -exec sudo chmod 2775 {} \;
+           find /var/www -type f -exec sudo chmod 0664 {} \;
+           wget https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.tar.gz
+           mkdir -p /var/www/html/phpMyAdmin
+           tar -xvzf phpMyAdmin-latest-all-languages.tar.gz -C /var/www/html/phpMyAdmin --strip-components 1
+           rm -f phpMyAdmin-latest-all-languages.tar.gz
+           systemctl start httpd mariadb
+           systemctl enable httpd mariadb
