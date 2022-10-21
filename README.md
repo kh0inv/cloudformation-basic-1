@@ -74,7 +74,7 @@ Sử dụng Mapping an toàn hơn Parameters vì các giá trị trong Mapping �
 
 Các tài nguyên sau khi tạo xong thường có giá trị trả về. Lấy Id thì sử dụng Fn::Ref. Để lấy giá trị khác thì sử dụng Fn::GetAtt
 
-Ruels
+## Rules
 - validate Parameters dựa vào các Parameters khác
 - bao gồm 1 Rule Condition (tùy chọn) và một hoặc nhiều Assertions
 
