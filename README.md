@@ -1,6 +1,3 @@
-# cloudformation-basic-1
-AWS CloudFormation Master Class v2 on Udemy (2022). Stephane Maarek
-
 # CloudFormation:
 khai báo, cấu hình các tài nguyên hạ tầng AWS bằng code
 
