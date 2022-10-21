@@ -1,7 +1,7 @@
 # CloudFormation:
 khai báo, cấu hình các tài nguyên hạ tầng AWS bằng code
 
-# Lợi ích của CFN
+### Lợi ích của CFN
 - Infrastructure as code
 	Không tài nguyên nào cần tạo thủ công, điều này giúp quản lý dễ hơn
 	Code có thể dễ dàng quản lý version, ví dụ dùng Git
@@ -25,7 +25,7 @@ Separate stack
 Template: là file JSON hoặc YAML chứa code khai báo
 Stack: tập hợp các tài nguyên được cung cấp theo như file template mô tả
 
-Flow Works
+### Flow Works
 Template -> S3 bucket <- AWS CloudFormation -> Stack -> AWS Resources
 Các template sẽ được upload lên S3 và AWS CFN sẽ lấy file từ S3 để đọc. Sau khi có thông tin, CFN sẽ tạo stack. Trong stack sẽ diễn ra các công việc tạo tài nguyên
 
@@ -33,7 +33,7 @@ Các template sẽ được upload lên S3 và AWS CFN sẽ lấy file từ S3 �
 
 Các stacks được xác định bởi tên. Xóa bỏ stack cũng sẽ xóa bỏ các tài nguyên được tạo ra trong stack
 
-## Parameters:
+### Parameters:
 - cho phép nhập vào giá trị tùy chọn mỗi lần tạo stack
 - validate các giá trị đầu vào (Type, Min/MaxLength, Min/MaxValue, AllowedValues, AllowedPattern)
 
@@ -47,49 +47,49 @@ Khi nào sử dụng Parameters
 Rseudo Parameters: là các tham số không cần khai báo và có thể sử dụng ở bất kỳ template nào
 Ví dụ: AWS::AccountId, AWS::Region, AWS::StackId,.,.
 
-## Resources:
+### Resources:
 - là thành phần chính khai báo các tài nguyên
 - thuộc tính DependsOn dùng để xác định tài nguyên chỉ được tạo sau khi 1 tài nguyên khác đã tạo xong.
 	Function !Ref và !GetAtt tự động áp dụng thuộc tính DependsOn
 - thuộc tính DeletionPolicy để xác định hành động khi tài nguyên bị xóa. Có 3 hành động là Retain, Snapshot, Delete
 - thuộc tính UpdateReplacePolicy để xác định hành động khi update replatement xảy ra với tài nguyên
 
-## Mapping:
+### Mapping:
 - là các giá trị cố định được sử dụng cho template
 - dùng để phân biệt giá trị được sử dụng cho từng môi trường, Region, AMI type,.,
 
-## So sánh Mapping với Parameters
+### So sánh Mapping với Parameters
 Sử dụng Mapping trong trường hợp ta biết tất cả giá trị có thể sử dụng liên quan đến Region, AZ, account, environment (dev vs prod).
 Sử dụng Parameter trong trường hợp giá trị dành riêng cho người dùng
 Sử dụng Mapping an toàn hơn Parameters vì các giá trị trong Mapping đều được xác định trước
 
-## Outputs:
+### Outputs:
 - khai báo các giá trị mà có thể dùng làm đầu vào cho các stack khác. Ví dụ: outputs của 1 stacks có thể là VPC ID hoặc Subnet ID để các stack khác có thể tham chiếu tới
 - Có thể xem giá trị các outputs trong AWS Console hoặc AWS CLI
 - Thường dùng cho mô hình Cross stack - các stack tạo sau sử dụng giá trị export của stack tạo trước
 
-## Conditions:
+### Conditions:
 - xác định xem tài nguyên có được tạo hay không
 - dựa vào các giá trị tham số đầu vào
 
 Các tài nguyên sau khi tạo xong thường có giá trị trả về. Lấy Id thì sử dụng Fn::Ref. Để lấy giá trị khác thì sử dụng Fn::GetAtt
 
-## Rules
+### Rules
 - validate Parameters dựa vào các Parameters khác
 - bao gồm 1 Rule Condition (tùy chọn) và một hoặc nhiều Assertions
 
-## Metadata:
+### Metadata:
 - cung cấp thêm thông tin cho template
 - AWS::CloudFormation::Designer thông tin kích thước, vị trí resource hiển thị trên design graph
 - AWS::CloudFormation::Interface nhóm và sắp xếp các Parameters hiển thị trên AWS Console
 - AWS::CloudFormation::Init dùng thay thế cho User data
 
-## Nested Stacks: mô hình lồng ghép các Stack.
+### Nested Stacks: mô hình lồng ghép các Stack.
 - Tạo ra các template định nghĩa nested stack, rồi upload lên S3
 - Root stack thông qua nested stack template để gọi đến chúng
 - 2 Root sack khác nhau cùng gọi đến 1 nested stack thì sẽ có 2 nested riêng biệt.
 
-## Exported Stack Output Values (Cross stack) vs Nested Stacks
+### Exported Stack Output Values (Cross stack) vs Nested Stacks
 - Có 1 tài nguyên trung tâm chia sẻ cho nhiều stack khác => dùngg Cross stack
 - Nếu các stack có nhu cầu cập nhật riêng lẻ => dùng Cross stack
 - Nếu tài nguyên chỉ được sử dụng bởi 1 stack và muốn tái sử dụng 1 phần code => dùng Nested stack
